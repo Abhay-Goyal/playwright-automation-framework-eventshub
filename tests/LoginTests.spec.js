@@ -37,12 +37,13 @@ test.describe("Login Tests", () => {
 
     // Verify the API request was successful
     expect(loginResponse.ok()).toBeTruthy();
-
     // Verify the success flag returned by the API
     expect(loginBody.success).toBeTruthy();
-
     // Validate that the stored token matches the API response
     expect(token).toBe(loginBody.token);
+
+    // Verify that after login user is navigated to the homepage
+    await expect(page).not.toHaveURL(/login/);
   });
 
   test("should display a network error when the login request fails", async ({ page, loginPage, mockUtil, apiUtil }) => {
@@ -64,6 +65,9 @@ test.describe("Login Tests", () => {
 
     // Verify the network error message is displayed
     await expect(page.getByText("✕Network Error×")).toBeVisible();
+
+    // Verify that after login user remains on the login page
+    await expect(page).toHaveURL(/login/);
   });
 
   test("should display an error for invalid login credentials", async ({ page, loginPage, apiUtil }) => {
@@ -86,6 +90,8 @@ test.describe("Login Tests", () => {
     await expect(page.locator(".pointer-events-auto>div>p")).toHaveText(
       userBody.error,
     );
+    // Verify that after login user remains on the login page
+    await expect(page).toHaveURL(/login/);
   });
 
   test("should display a server error when the server is down", async ({ page, mockUtil, loginPage, apiUtil }) => {
@@ -109,5 +115,7 @@ test.describe("Login Tests", () => {
     await expect(page.locator(".pointer-events-auto>div>p")).toHaveText(
       "Request failed with status code 500",
     );
+    // Verify that after login user remains on the login page
+    await expect(page).toHaveURL(/login/);
   });
 });
