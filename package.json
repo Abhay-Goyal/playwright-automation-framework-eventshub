@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test" : "ENV=test npx playwright test --project=chromium"
+    "test" : "ENV=test npx playwright test --project=chromium",
+    "allure:generate": "npx allure generate ./allure-results",
+    "allure:open": "npx allure open",
+    "allure:serve": "npx allure open ./allure-results"
   },
   "keywords": [],
   "author": "",

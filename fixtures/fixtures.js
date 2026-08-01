@@ -1,11 +1,17 @@
 import { test as base } from "@playwright/test";
-import { LoginPage } from "../pages/Loginpage";
-import { APIutil } from "../utils/APIutil";
-import { Mockutil } from "../utils/Mockutil";
+import { LoginPage } from "../pages/Loginpage.js";
+import { APIutil } from "../utils/APIutil.js";
+import { Mockutil } from "../utils/Mockutil.js";
+import { RegistrationPage } from "../pages/RegistrationPage.js";
+
 
 export const test = base.extend({
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));
+  },
+
+  registrationPage: async ({ page }, use) => {
+    await use(new RegistrationPage(page));
   },
 
   apiUtil: async ({ page, request }, use) => {
@@ -14,5 +20,7 @@ export const test = base.extend({
 
   mockUtil : async({page} , use) => {
     await use(new Mockutil(page));
-  }
+  },
+
+ 
 });
