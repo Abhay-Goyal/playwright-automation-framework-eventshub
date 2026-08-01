@@ -1,0 +1,14 @@
+[
+{
+"validuser" : {
+    "email" : "zuratoki94@gmail.com",
+    "password" : "Echo@2019"
+}
+},
+{
+    "invaliduser": {
+        "email" : "zuratoki@gmail.com",
+        "password" : "Echo@2019"
+    }
+}
+]
