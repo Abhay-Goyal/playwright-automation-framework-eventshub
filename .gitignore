@@ -152,6 +152,7 @@ node_modules/
 
 # Environment variables (IMPORTANT — never commit secrets)
 .env
+.env/
 .env.local
 .env.*.local
 
@@ -178,3 +179,6 @@ yarn-error.log*
 
 # TypeScript build info
 *.tsbuildinfo
+
+#User data 
+userDetails.json
