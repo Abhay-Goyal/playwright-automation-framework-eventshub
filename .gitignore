@@ -181,4 +181,4 @@ yarn-error.log*
 *.tsbuildinfo
 
 #User data 
-userDetails.json
+/userDetails.json
