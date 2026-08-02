@@ -17,4 +17,16 @@ export class Mockutil {
       await route.abort();
     });
   }
+
+
+
+  async mockRequest(url , method = "GET"){
+     this.page.route(`**/*/${url}`, async (route) => {
+      await route.continue({
+        method
+      });
+    })
+  }
+
+
 }

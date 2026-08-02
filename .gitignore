@@ -149,6 +149,7 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/allure-results
 
 # Environment variables (IMPORTANT — never commit secrets)
 .env
