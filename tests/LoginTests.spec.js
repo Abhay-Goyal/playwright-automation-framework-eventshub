@@ -5,7 +5,7 @@ import path from "path";
 
 // Read the test data from the JSON file
 const file = fs.readFileSync(
-  path.join(__dirname, "../userDetails.json"),
+  path.join(import.meta.dirname, "../userDetails.json"),
   "utf-8",
 );
 
@@ -16,10 +16,15 @@ const validUser = userData[0].validuser;
 const invalidUser = userData[1].invaliduser;
 
 test.describe("Login Tests", () => {
-  test("should login successfully with valid credentials", async ({ page, loginPage, apiUtil }) => {
-    // Navigate to the login page
+  test.beforeEach(async ({ loginPage }) => {
     await loginPage.navigate_to_login_page();
+  });
 
+  test("should login successfully with valid credentials", async ({
+    page,
+    loginPage,
+    apiUtil,
+  }) => {
     // Trigger login and wait for the login API response simultaneously
 
     const [loginResponse] = await Promise.all([
@@ -46,10 +51,12 @@ test.describe("Login Tests", () => {
     await expect(page).not.toHaveURL(/login/);
   });
 
-  test("should display a network error when the login request fails", async ({ page, loginPage, mockUtil, apiUtil }) => {
-    // Navigate to the login page
-    await loginPage.navigate_to_login_page();
-
+  test("should display a network error when the login request fails", async ({
+    page,
+    loginPage,
+    mockUtil,
+    apiUtil,
+  }) => {
     // Mock a network failure for the login API
     await mockUtil.mockNetworkError("login");
 
@@ -70,10 +77,11 @@ test.describe("Login Tests", () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test("should display an error for invalid login credentials", async ({ page, loginPage, apiUtil }) => {
-    // Navigate to the login page
-    await loginPage.navigate_to_login_page();
-
+  test("should display an error for invalid login credentials", async ({
+    page,
+    loginPage,
+    apiUtil,
+  }) => {
     // Trigger login and wait for the login API response
     const [loginResponse] = await Promise.all([
       apiUtil.waitForResponse("login", "POST"),
@@ -94,12 +102,13 @@ test.describe("Login Tests", () => {
     await expect(page).toHaveURL(/login/);
   });
 
-  test("should display a server error when the server is down", async ({ page, mockUtil, loginPage, apiUtil }) => {
-    // Navigate to the login page
-    await loginPage.navigate_to_login_page();
-
-
-  // Mock the login API to return a 500 Internal Server Error
+  test("should display a server error when the server is down", async ({
+    page,
+    mockUtil,
+    loginPage,
+    apiUtil,
+  }) => {
+    // Mock the login API to return a 500 Internal Server Error
     await mockUtil.mockResonse("login", undefined, 500);
 
     // Trigger login and wait for the login API response

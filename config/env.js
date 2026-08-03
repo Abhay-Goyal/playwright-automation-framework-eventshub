@@ -2,7 +2,7 @@ import dotenv from "dotenv"
 import path from "path";
 
 dotenv.config({
-    path : path.join(__dirname , `../.env/.env.${process.env.ENV}`)
+    path : path.join(import.meta.dirname , `../.env/.env.${process.env.ENV}`)
 })
 
 export const config = {

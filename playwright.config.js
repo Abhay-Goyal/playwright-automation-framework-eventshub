@@ -1,7 +1,10 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
 import {config} from "./config/env.js";
+import fs from "fs";
 
+
+fs.rmSync('allure-results', { recursive: true, force: true });
 
 /**
  * Read environment variables from file.
@@ -41,7 +44,7 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] ,
         baseURL : config.base_url,
-        headless : false,
+        headless : true,
         launchOptions : {
           slowMo : 1000
         }

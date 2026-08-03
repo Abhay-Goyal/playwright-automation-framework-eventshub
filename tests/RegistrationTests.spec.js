@@ -2,13 +2,20 @@ import { test } from "../fixtures/fixtures.js";
 import { expect } from "@playwright/test";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
+// Load test user credentials from the JSON fixture
 const userData = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "../userDetails.json"), "utf-8"),
+  fs.readFileSync(
+    path.join(import.meta.dirname, "../userDetails.json"),
+    "utf-8",
+  ),
 );
 
+// Existing registered user used for negative registration scenarios
 const validUser = userData[0].validuser;
 
+// Expected password requirements displayed on the registration page
 const passwordGuideLines = [
   "At least 8 characters",
   "One uppercase letter (A–Z)",
@@ -16,41 +23,56 @@ const passwordGuideLines = [
   "One special character (!@#$%^&*…)",
 ];
 
-const randomNumber = Math.floor(Math.random() * 10) + 1;
+// Generate a unique email so the registration test can run repeatedly without duplicate-user failures.
+const randomEmail = `zuratoki-${crypto.randomUUID()}@gmail.com`;
 
 test.describe("User registration tests", () => {
+  // Navigate to the registration page before each test
+  // and verify the page loads with the expected password guidance.
+  test.beforeEach(async ({ registrationPage }) => {
+    await registrationPage.navigate_to_registration_page();
+
+    await expect(registrationPage.registration_header).toBeVisible();
+
+    expect(await registrationPage.getPasswordGuidelines()).toEqual(
+      passwordGuideLines,
+    );
+  });
+
   test("should be able to see error messages when user enters wrong or empty details", async ({
     page,
     registrationPage,
   }) => {
-    await registrationPage.navigate_to_registration_page();
-    await expect(registrationPage.registration_header).toBeVisible();
-    expect(await registrationPage.getPasswordGuidelines()).toEqual(
-      passwordGuideLines,
-    );
+    // Submit the form without entering any details.
     await registrationPage.click_on_create_account_link();
 
-    // Verify that error messages are displayed for email and password fields
+    // Verify email and password validation messages are displayed.
     await expect(registrationPage.email_error_message).toBeVisible();
     await expect(registrationPage.password_error_message).toBeVisible();
+
+    // Validation messages should be displayed in red.
     await expect(registrationPage.email_error_message).toHaveCSS(
       "color",
       "rgb(220, 38, 38)",
     );
+
     await expect(registrationPage.password_error_message).toHaveCSS(
       "color",
       "rgb(220, 38, 38)",
     );
 
+    // Fill only the password to trigger confirm-password validation.
     await registrationPage.password.fill("Test1234");
     await registrationPage.click_on_create_account_link();
 
-    // Verify that error message is displayed for confirm password field
-    await expect(registrationPage.confirm_password_error_message).toBeVisible();
-    await expect(registrationPage.confirm_password_error_message).toHaveCSS(
-      "color",
-      "rgb(220, 38, 38)",
-    );
+    // Verify confirm-password validation is displayed.
+    await expect(
+      registrationPage.confirm_password_error_message,
+    ).toBeVisible();
+
+    await expect(
+      registrationPage.confirm_password_error_message,
+    ).toHaveCSS("color", "rgb(220, 38, 38)");
   });
 
   test("should be able to register a new user successfully", async ({
@@ -58,36 +80,38 @@ test.describe("User registration tests", () => {
     registrationPage,
     apiUtil,
   }) => {
-    await registrationPage.navigate_to_registration_page();
-    await expect(registrationPage.registration_header).toBeVisible();
+    // Fill the registration form with valid user details.
     await registrationPage.register_user(
-      `zuratoki${randomNumber}@gmail.com`,
+      randomEmail,
       "Testing@123",
     );
 
-    expect(await registrationPage.getPasswordGuidelines()).toEqual(
-      passwordGuideLines,
-    );
-
+    // Every password guideline should indicate success.
     for (
       let i = 0;
       i < (await registrationPage.password_guidelines.count());
       i++
     ) {
-      let guideline = registrationPage.password_guidelines.nth(i);
+      const guideline = registrationPage.password_guidelines.nth(i);
 
-      await expect(guideline).toHaveCSS("color", "rgb(5, 150, 105)");
+      await expect(guideline).toHaveCSS(
+        "color",
+        "rgb(5, 150, 105)",
+      );
     }
 
+    // Submit the registration form while waiting for the API response.
     const [registerResponse] = await Promise.all([
       apiUtil.waitForResponse("register", "POST"),
       registrationPage.click_on_create_account_link(),
     ]);
 
+    // Successful registration redirects the user to the home page.
     await expect(page).toHaveURL("/");
 
     const userBody = await registerResponse.json();
 
+    // Validate the registration API response.
     expect(registerResponse.ok()).toBeTruthy();
     expect(registerResponse.status()).toBe(201);
     expect(userBody.success).toBeTruthy();
@@ -98,9 +122,11 @@ test.describe("User registration tests", () => {
     registrationPage,
     apiUtil,
   }) => {
-    await registrationPage.navigate_to_registration_page();
-    await expect(registrationPage.registration_header).toBeVisible();
-    await registrationPage.register_user(validUser.email, validUser.password);
+    // Attempt to register with an account that already exists.
+    await registrationPage.register_user(
+      validUser.email,
+      validUser.password,
+    );
 
     const [registerResponse] = await Promise.all([
       apiUtil.waitForResponse("register", "POST"),
@@ -109,13 +135,19 @@ test.describe("User registration tests", () => {
 
     const userBody = await registerResponse.json();
 
-    await expect(registrationPage.already_have_an_account_flash).toBeVisible();
+    // Verify the backend error is displayed to the user.
+    await expect(
+      registrationPage.already_have_an_account_flash,
+    ).toBeVisible();
+
     await expect(
       registrationPage.already_have_an_account_flash_message,
     ).toHaveText(userBody.error);
 
+    // User should remain on the registration page.
     await expect(page).toHaveURL("/register");
 
+    // Validate the failed API response.
     expect(registerResponse.ok()).toBeFalsy();
     expect(registerResponse.status()).toBe(400);
     expect(userBody.success).toBeFalsy();
@@ -127,33 +159,40 @@ test.describe("User registration tests", () => {
     apiUtil,
     mockUtil,
   }) => {
-    await registrationPage.navigate_to_registration_page();
-
+    // Mock a network failure for the registration endpoint.
     await mockUtil.mockNetworkError("register");
 
-    await registrationPage.register_user(validUser.email, validUser.password);
+    await registrationPage.register_user(
+      validUser.email,
+      validUser.password,
+    );
 
+    // Submit the registration request while capturing the outgoing request.
     const [registerRequest] = await Promise.all([
       apiUtil.waitForRequest("register", "POST"),
       registrationPage.click_on_create_account_link(),
     ]);
 
+    // Verify the request details.
     expect(registerRequest.method()).toBe("POST");
     expect(registerRequest.url()).toContain("/register");
+
+    // Aborted requests do not receive a response.
     expect(await registerRequest.response()).toBeNull();
+
+    // Verify the application displays a network error.
     await expect(
       registrationPage.already_have_an_account_flash_message,
     ).toHaveText(/Network Error/);
   });
 
-  test.only("should get error message when wrong method passed", async ({
+  test("should get error message when wrong method passed", async ({
     page,
     registrationPage,
     mockUtil,
     apiUtil,
   }) => {
-    await registrationPage.navigate_to_registration_page();
-
+    // Mock the registration endpoint with an incorrect HTTP method.
     await mockUtil.mockRequest("register");
 
     await registrationPage.register_user(
@@ -161,6 +200,7 @@ test.describe("User registration tests", () => {
       validUser.password,
     );
 
+    // Submit the registration request and wait for the mocked GET response.
     const [registerResponse] = await Promise.all([
       apiUtil.waitForResponse("register", "GET"),
       registrationPage.click_on_create_account_link(),
@@ -168,8 +208,16 @@ test.describe("User registration tests", () => {
 
     const userBody = await registerResponse.json();
 
+    // Verify the mocked endpoint returns a 404 response.
+    expect(registerResponse.status()).toBe(404);
+    expect(registerResponse.ok()).toBeFalsy();
+
+    // Verify the backend error message is displayed.
     await expect(
       registrationPage.already_have_an_account_flash_message,
     ).toHaveText(userBody.error);
+
+    // User should remain on the registration page.
+    await expect(page).toHaveURL("/register");
   });
 });
