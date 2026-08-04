@@ -1,7 +1,14 @@
 name: Eventhub Test Run
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
   Run_Playwright_Tests:
