@@ -1,11 +1,14 @@
-import dotenv from "dotenv"
+import dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({
-    path : path.join(import.meta.dirname , `../.env/.env.${process.env.ENV}`)
-})
+if (process.env.GITHUB_ACTIONS !== "true") {
+  dotenv.config({
+    path: path.join(import.meta.dirname, `../.env/.env.${process.env.ENV}`),
+  });
+}
 
 export const config = {
-    base_url : process.env.base_url,
-    timeout : parseInt(process.env.timeout)
-}
+  BASE_URL: process.env.BASE_URL,
+  TIMEOUT: Number(process.env.TIMEOUT),
+  API_URL: process.env.API_URL
+};

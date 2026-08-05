@@ -1,6 +1,7 @@
 export class APIutil {
   constructor(request, page) {
-    ((this.request = request), (this.page = page));
+    this.request = request;
+    this.page = page;
   }
 
   async waitForResponse(url, method) {
@@ -19,4 +20,20 @@ export class APIutil {
     });
     return request;
   }
-}
+
+  async postRequest(url, data = {}, headers = {}) {
+     const response= await this.request.post(url , {
+      data : data,
+      headers : headers
+    });
+
+    return response;
+  }
+
+  async deleteRequest(url,headers ={}){
+    const response = await this.request.delete(url, {
+      headers
+    });
+    return response;
+  }
+};

@@ -3,6 +3,8 @@ import { LoginPage } from "../pages/Loginpage.js";
 import { APIutil } from "../utils/APIutil.js";
 import { Mockutil } from "../utils/Mockutil.js";
 import { RegistrationPage } from "../pages/RegistrationPage.js";
+import { HomePage } from "../pages/HomePage.js";
+import { BookingDetailsPage } from "../pages/BookingDetailsPage.js";
 
 
 export const test = base.extend({
@@ -14,6 +16,10 @@ export const test = base.extend({
     await use(new RegistrationPage(page));
   },
 
+  homePage : async({page} , use) => {
+    await use(new HomePage(page));
+  },
+
   apiUtil: async ({ page, request }, use) => {
     await use(new APIutil(request, page));
   },
@@ -21,6 +27,10 @@ export const test = base.extend({
   mockUtil : async({page} , use) => {
     await use(new Mockutil(page));
   },
+
+  bookingDetailsPage : async({page} , use) => {
+    await use(new BookingDetailsPage(page))
+  }
 
  
 });
