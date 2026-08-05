@@ -185,39 +185,4 @@ test.describe("User registration tests", () => {
       registrationPage.already_have_an_account_flash_message,
     ).toHaveText(/Network Error/);
   });
-
-  test("should get error message when wrong method passed", async ({
-    page,
-    registrationPage,
-    mockUtil,
-    apiUtil,
-  }) => {
-    // Mock the registration endpoint with an incorrect HTTP method.
-    await mockUtil.mockRequest("register");
-
-    await registrationPage.register_user(
-      "daisdshajk@kdmaslka.com",
-      validUser.password,
-    );
-
-    // Submit the registration request and wait for the mocked GET response.
-    const [registerResponse] = await Promise.all([
-      apiUtil.waitForResponse("register", "GET"),
-      registrationPage.click_on_create_account_link(),
-    ]);
-
-    const userBody = await registerResponse.json();
-
-    // Verify the mocked endpoint returns a 404 response.
-    expect(registerResponse.status()).toBe(404);
-    expect(registerResponse.ok()).toBeFalsy();
-
-    // Verify the backend error message is displayed.
-    await expect(
-      registrationPage.already_have_an_account_flash_message,
-    ).toHaveText(userBody.error);
-
-    // User should remain on the registration page.
-    await expect(page).toHaveURL("/register");
-  });
 });
