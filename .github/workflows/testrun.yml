@@ -48,7 +48,7 @@ jobs:
         env:
           BASE_URL: ${{ secrets.BASE_URL }}
           TIMEOUT: ${{ secrets.TIMEOUT }}
-          API_URL: ${{ secrets.API_URL }}
+          API_URL: ${{ secrets.APIURL }}
 
       - name: Upload Playwright reports
         if: always()
