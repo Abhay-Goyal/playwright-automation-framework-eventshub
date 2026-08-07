@@ -1,5 +1,4 @@
-import { test } from "../fixtures/fixtures.js";
-import { expect } from "@playwright/test";
+import { test, expect } from "../fixtures/fixtures.js";
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
@@ -66,13 +65,12 @@ test.describe("User registration tests", () => {
     await registrationPage.click_on_create_account_link();
 
     // Verify confirm-password validation is displayed.
-    await expect(
-      registrationPage.confirm_password_error_message,
-    ).toBeVisible();
+    await expect(registrationPage.confirm_password_error_message).toBeVisible();
 
-    await expect(
-      registrationPage.confirm_password_error_message,
-    ).toHaveCSS("color", "rgb(220, 38, 38)");
+    await expect(registrationPage.confirm_password_error_message).toHaveCSS(
+      "color",
+      "rgb(220, 38, 38)",
+    );
   });
 
   test("should be able to register a new user successfully", async ({
@@ -81,10 +79,7 @@ test.describe("User registration tests", () => {
     apiUtil,
   }) => {
     // Fill the registration form with valid user details.
-    await registrationPage.register_user(
-      randomEmail,
-      "Testing@123",
-    );
+    await registrationPage.register_user(randomEmail, "Testing@123");
 
     // Every password guideline should indicate success.
     for (
@@ -94,10 +89,7 @@ test.describe("User registration tests", () => {
     ) {
       const guideline = registrationPage.password_guidelines.nth(i);
 
-      await expect(guideline).toHaveCSS(
-        "color",
-        "rgb(5, 150, 105)",
-      );
+      await expect(guideline).toHaveCSS("color", "rgb(5, 150, 105)");
     }
 
     // Submit the registration form while waiting for the API response.
@@ -123,10 +115,7 @@ test.describe("User registration tests", () => {
     apiUtil,
   }) => {
     // Attempt to register with an account that already exists.
-    await registrationPage.register_user(
-      validUser.email,
-      validUser.password,
-    );
+    await registrationPage.register_user(validUser.email, validUser.password);
 
     const [registerResponse] = await Promise.all([
       apiUtil.waitForResponse("register", "POST"),
@@ -136,9 +125,7 @@ test.describe("User registration tests", () => {
     const userBody = await registerResponse.json();
 
     // Verify the backend error is displayed to the user.
-    await expect(
-      registrationPage.already_have_an_account_flash,
-    ).toBeVisible();
+    await expect(registrationPage.already_have_an_account_flash).toBeVisible();
 
     await expect(
       registrationPage.already_have_an_account_flash_message,
@@ -162,10 +149,7 @@ test.describe("User registration tests", () => {
     // Mock a network failure for the registration endpoint.
     await mockUtil.mockNetworkError("register");
 
-    await registrationPage.register_user(
-      validUser.email,
-      validUser.password,
-    );
+    await registrationPage.register_user(validUser.email, validUser.password);
 
     // Submit the registration request while capturing the outgoing request.
     const [registerRequest] = await Promise.all([

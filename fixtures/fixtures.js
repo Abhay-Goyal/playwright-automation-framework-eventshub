@@ -5,6 +5,8 @@ import { Mockutil } from "../utils/Mockutil.js";
 import { RegistrationPage } from "../pages/RegistrationPage.js";
 import { HomePage } from "../pages/HomePage.js";
 import { BookingDetailsPage } from "../pages/BookingDetailsPage.js";
+import { EventsPage } from "../pages/EventsPage.js";
+import { NewEventsPage } from "../pages/NewEventsPage.js";
 
 
 export const test = base.extend({
@@ -30,7 +32,17 @@ export const test = base.extend({
 
   bookingDetailsPage : async({page} , use) => {
     await use(new BookingDetailsPage(page))
+  },
+
+  eventsPage : async({page} ,use) => {
+    await use(new EventsPage(page))
+  },
+
+  newEventsPage : async({page},use)=> {
+    await use(new NewEventsPage(page));
   }
 
  
 });
+
+export {expect} from "@playwright/test";
