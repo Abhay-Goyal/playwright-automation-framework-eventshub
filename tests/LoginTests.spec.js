@@ -1,5 +1,4 @@
-import { test } from "../fixtures/fixtures.js";
-import { expect } from "@playwright/test";
+import { test, expect } from "../fixtures/fixtures.js";
 import fs from "fs";
 import path from "path";
 

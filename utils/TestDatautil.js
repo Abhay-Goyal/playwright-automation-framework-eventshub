@@ -1,5 +1,7 @@
 import { faker } from "@faker-js/faker";
 
+const categories = ["Conference", "Concert", "Sports", "Workshop", "Festival"];
+
 export function createBookData() {
   return {
     customerName: faker.person.fullName(),
@@ -9,15 +11,15 @@ export function createBookData() {
   };
 }
 
-export function createEventData(categories) {
+export function createEventData(data = categories) {
   return {
     title: faker.company.name(),
     description: faker.lorem.sentence(),
-    category: faker.helpers.arrayElement(categories),
+    category: faker.helpers.arrayElement(data),
     venue: faker.location.streetAddress(),
     city: faker.location.city(),
     eventDate: faker.date.future().toISOString(),
-    price: faker.finance.amount({ min: 500, max: 10000, dec: 0 }),
+    price: faker.number.int({ min: 500, max: 10000}),
     totalSeats: faker.number.int({ min: 500, max: 1000 }),
   };
 }

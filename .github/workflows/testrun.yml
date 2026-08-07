@@ -33,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Install Playwright browsers
-        run: npx playwright install ${{matrix.browser}}
+        run: npx playwright install --with-deps
 
       - name: Create users.json
         run: |

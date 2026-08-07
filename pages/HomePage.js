@@ -1,20 +1,23 @@
 export class HomePage {
   constructor(page) {
     this.page = page;
-    this.events = page.getByRole("link", { name: "Events" });
-    this.my_bookings = page.getByRole("link", { name: "My Bookings" });
-    this.logout = page.getByRole("button", { name: "Logout" });
+    this.events = page.getByTestId("nav-events");
+    this.myBookings = page.getByTestId("nav-bookings");
+    this.logout = page.getByTestId("logout-btn");
     this.banner = page.locator("section[class*='text-white overflow-hidden']");
-    this.browse_events = page.getByRole("link", { name: /Browse Events/ });
-    this.view_all = page.getByRole("link", { name: /View all/ });
-    this.featured_events = page.getByTestId("event-card");
-    this.book_now = page.getByTestId("book-now-btn");
+    this.browseEvents =  page.getByText('Browse Events →');
+    this.viewAll = page.getByRole("link", { name: /View all/ });
+    this.featuredEvents = page.getByTestId("event-card");
   }
 
   async bookSpecificEvent(eventName) {
-    const event = this.featured_events.filter({
-      hasText: `${eventName}`,
+    const event = this.featuredEvents.filter({
+      hasText: eventName,
     });
     await event.getByTestId("book-now-btn").click();
+  }
+
+  async openEventsPage(){
+    await this.events.click();
   }
 }
