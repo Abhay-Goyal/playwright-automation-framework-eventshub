@@ -46,16 +46,16 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name : "setup",
-      testDir : "./tests/auth",
-      testMatch : "setup.auth.js"
+      name: "setup",
+      testDir: "./tests/auth",
+      testMatch: "setup.auth.js",
     },
     {
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
       },
-      dependencies : ["setup"]
+      dependencies: ["setup"],
     },
 
     {
@@ -63,11 +63,13 @@ export default defineConfig({
       use: {
         ...devices["Desktop Firefox"],
       },
+      dependencies: ["setup"],
     },
 
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
+      dependencies: ["setup"],
     },
   ],
 });
